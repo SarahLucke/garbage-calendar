@@ -51,9 +51,9 @@ def setHouseNumbers(event):
             selected_street = street
             for house_number in selected_street['houseNumbers']:
                 result.append(house_number[0])
-            number_chooser['values'] = tuple(result)
             break
-        number_chooser.bind("<<ComboboxSelected>>", startGeneration)
+    number_chooser['values'] = tuple(result)
+    number_chooser.bind("<<ComboboxSelected>>", startGeneration)
 
 def handle_street_keyrelease(event):
     typed = street_chooser.get()
@@ -81,7 +81,6 @@ query_window.mainloop()
 
 if area_id.__eq__(""):
     sys.exit("the data you entered is not complete")
-## parse params from input
     
 params = {
         "idx": "termins",
