@@ -202,7 +202,7 @@ for month in range(1, 13):
         # print "Sa" and "So" bold:
         if(runningDate.weekday() == 5 or runningDate.weekday() == 6):
             cell.font = Font(bold=True)
-        # put bprders
+        # put borders
         cell.border = full_border
         for colCounter in range(1,rowspan+1):
             cell = ws.cell(row=yPos, column=xPos+colCounter)
@@ -213,8 +213,13 @@ for month in range(1, 13):
             else:
                 cell.border = top_bottom_border
 
+        # skip (continue counting) if wrong year:
+        while datetime.strptime(data[counter]['cal_date'], "%Y-%m-%d").date().year != thisYear:
+        	counter += 1
+        	calendarDate = datetime.strptime(data[counter]['cal_date'], "%Y-%m-%d").date()
+        
         # write all garbage info for the day:
-        if(datetime.strptime(data[counter]['cal_date'], "%Y-%m-%d").date() == runningDate):
+        if datetime.strptime(data[counter]['cal_date'], "%Y-%m-%d").date() == runningDate:
             xcounter = 1
             
             while(datetime.strptime(data[counter]['cal_date'], "%Y-%m-%d").date() == runningDate):
@@ -239,7 +244,14 @@ for month in range(1, 13):
     for colCounter in range(0,rowspan+1):
         cell=ws.cell(row=yOffset+32, column=xPos+colCounter)
         cell.border = top_border
-                
+
+# define print area
+ws.print_area ='A1:AK35'
+# set to page landscape mode
+ws.set_printer_settings(paper_size=openpyxl.worksheet.worksheet.Worksheet.PAPERSIZE_A4 , orientation=openpyxl.worksheet.worksheet.Worksheet.ORIENTATION_LANDSCAPE)
+# define scaling when printing
+ws.sheet_properties.pageSetUpPr.fitToPage = True
+ws.page_setup.fitToHeight = False
 
 wb.save("garbageCalendar"+str(thisYear)+".xls")
 print('finished')
