@@ -1,1 +1,9 @@
 *.xls
+/.metadata/
+.python-version
+GarbageCalendar.egg-info/
+build/
+*/.project
+*/.pydevproject
+*/__pycache__/
+
