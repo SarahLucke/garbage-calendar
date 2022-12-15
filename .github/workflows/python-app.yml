@@ -30,11 +30,14 @@ jobs:
       run: |
         # stop the build if there are Python syntax errors or undefined names
         python3 -m GarbageCalendar Ingolstadt Schoberstr. 26
-    - name: upload file
-      run: |
-        git config --global user.name 'Sarah Lucke'
-        git config --global user.email '72335980+SarahLucke@users.noreply.github.com'
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git commit -am "New calendar file auto-generated"
-        git push
+    - name: archive created file
+      uses: actions/upload-artifact@v3
+      with:
+        name: calendar_xml
+        path: garbageCalendar*.xls
+        retention-days: 1
+    - name: Download created file
+      uses: actions/download-artifact@v3
+      with:
+        name: garbageCalendar*.xls
 
