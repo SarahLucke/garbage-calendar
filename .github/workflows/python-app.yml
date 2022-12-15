@@ -36,8 +36,4 @@ jobs:
         name: calendar_xml
         path: garbageCalendar*.xls
         retention-days: 1
-    - name: Download created file
-      uses: actions/download-artifact@v3
-      with:
-        name: calendar_xml
 
