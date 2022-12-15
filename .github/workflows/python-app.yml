@@ -1,15 +1,23 @@
-# This workflow will install ...
 
 name: Application Runner
-
 on:
-#  schedule:
-#    - cron: "0 13 1 1 *" #run on first of January every year, 13:00
   [push, workflow_dispatch]
 
 permissions:
   contents: read
 
+inputs:
+  city:
+    description: 'City you wish to create the calendar for'
+    required: false
+    default: 'Ingolstadt'
+  street:
+    description: 'Street you wish to create the calendar for'
+    required: true
+  house-number:
+    description: 'House number you wish to create the calendar for'
+    required: true
+      
 jobs:
   run-creation:
 
@@ -17,6 +25,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
@@ -26,10 +35,12 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         python3 -m pip install -e .
+
     - name: run the script
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        python3 -m GarbageCalendar Ingolstadt Schoberstr. 26
+        python3 -m GarbageCalendar ${{ inputs.city }} ${{ inputs.street }} ${{ inputs.house-number }}
+        
     - name: archive created file
       uses: actions/upload-artifact@v3
       with:
