@@ -39,5 +39,5 @@ jobs:
     - name: Download created file
       uses: actions/download-artifact@v3
       with:
-        name: garbageCalendar*.xls
+        name: calendar_xml
 
