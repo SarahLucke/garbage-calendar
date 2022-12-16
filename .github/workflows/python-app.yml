@@ -1,23 +1,22 @@
 
 name: Application Runner
 on:
-  [push, workflow_dispatch]
+  workflow_dispatch:
+    inputs:
+      city:
+        description: 'City you wish to create the calendar for'
+        required: false
+        default: 'Ingolstadt'
+      street:
+        description: 'Street you wish to create the calendar for'
+        required: true
+      house-number:
+        description: 'House number you wish to create the calendar for'
+        required: true
 
 permissions:
   contents: read
 
-inputs:
-  city:
-    description: 'City you wish to create the calendar for'
-    required: false
-    default: 'Ingolstadt'
-  street:
-    description: 'Street you wish to create the calendar for'
-    required: true
-  house-number:
-    description: 'House number you wish to create the calendar for'
-    required: true
-      
 jobs:
   run-creation:
 
