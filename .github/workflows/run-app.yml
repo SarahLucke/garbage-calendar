@@ -1,0 +1,46 @@
+name: Application Runner
+on:
+  workflow_dispatch:
+    inputs:
+      city:
+        description: 'City you wish to create the calendar for'
+        required: false
+        default: 'Ingolstadt'
+      street:
+        description: 'Street you wish to create the calendar for (they may be abbreviated like *str.)'
+        required: true
+      house-number:
+        description: 'House number you wish to create the calendar for'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  run-app:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        python3 -m pip install -e .
+    - name: run the script
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        python3 -m GarbageCalendar ${{ inputs.city }} ${{ inputs.street }} ${{ inputs.house-number }}
+        
+    - name: archive created file
+      uses: actions/upload-artifact@v3
+      with:
+        name: calendar_xml
+        path: garbageCalendar*.xls
+        retention-days: 1
