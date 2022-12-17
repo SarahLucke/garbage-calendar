@@ -11,7 +11,7 @@ if __name__ == "__main__":
     # if no arguments provided, open GUI:
     if len(sys.argv) == 1:
         user_input = Gui()
-        if user_input.area_id.__eq__(""):
+        if user_input.location.area_id.__eq__(""):
             sys.exit("the data you entered is not complete")
     else:
         user_input = UserInput(
@@ -19,10 +19,11 @@ if __name__ == "__main__":
             street=sys.argv[2],
             house_number=sys.argv[3],
         )
-        if user_input.area_id.__eq__(""):
+        if user_input.location.area_id.__eq__(""):
             sys.exit("the data you entered is not complete or faulty")
 
     table_creator = TableCreator(user_input)
+    table_creator.create_pdf()
     table_creator.create_excel()
 
     print("finished")

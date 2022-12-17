@@ -5,15 +5,12 @@ from .location import Location
 
 
 class Gui:
-    city_id = ""
-    area_id = ""
-    selected_street_name = ""
+    street = ""
 
     def __init__(self):
-        city = "Ingolstadt"
+        self.city = "Ingolstadt"
         ## open gui (pipe response from api through) and ask for street and housenumber.
         self.location = Location(city)
-        self.city_id = self.location.city_id
         ## interact with user:
         self.query_window = tk.Tk()
         self.query_window.title("Additional information required")
@@ -40,9 +37,9 @@ class Gui:
         self.query_window.mainloop()
 
     def setHouseNumbers(self, event):
-        self.selected_street_name = self.street_chooser.get()
+        self.street = self.street_chooser.get()
         self.number_chooser["values"] = tuple(
-            self.location.get_street_house_numbers(self.selected_street_name)
+            self.location.get_street_house_numbers(self.street)
         )
         self.number_chooser.bind("<<ComboboxSelected>>", self.startGeneration)
 
@@ -54,8 +51,6 @@ class Gui:
         self.street_chooser.event_generate("<Down>")
 
     def startGeneration(self, event):
-        selected_house_number = self.number_chooser.get()
-        self.area_id = self.location.get_ref_area(
-            self.selected_street_name, selected_house_number
-        )
+        self.house_number = self.number_chooser.get()
+        self.area_id = self.location.get_ref_area(self.street, self.house_number)
         self.query_window.destroy()

@@ -6,8 +6,6 @@ from .base_requests import BaseRequests
 
 
 class Location(BaseRequests):
-    city_id = ""
-
     def __init__(self, city: str):
         super().__init__(city)
         response = requests.get(self.get_url_streets())
@@ -36,4 +34,5 @@ class Location(BaseRequests):
             if street["name"] == selected_street_name:
                 for number in street["houseNumbers"]:
                     if number[0].__eq__(selected_house_number):
-                        return number[1]
+                        self.area_id = number[1]
+                        return self.area_id
