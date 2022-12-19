@@ -11,6 +11,6 @@ setup(
     license="GNU GPL3",
     packages=["GarbageCalendar"],
     python_requires=">=3.6",
-    install_requires=["openpyxl", "requests"],
+    install_requires=["openpyxl", "requests", "matplotlib"],
     zip_safe=True,
 )
