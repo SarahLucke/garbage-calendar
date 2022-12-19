@@ -1,19 +1,19 @@
-import requests
+import calendar
+from calendar import monthrange
+
+from datetime import datetime
+from datetime import date
+
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib import colors
 
 from openpyxl.styles.fills import PatternFill
 import openpyxl
 from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-from datetime import datetime
-from datetime import date
-
-import calendar
-from calendar import monthrange
-
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-from matplotlib import colors
+import requests
 
 from .base_requests import BaseRequests
 
@@ -44,20 +44,18 @@ class TableCreator(BaseRequests):
     }
 
     def __init__(self, user_input):
-        self.thisYear = user_input.year
-        if self.thisYear < date.today().year:
-            self.thisYear = date.today().year
+        self.selected_year = user_input.year
+        if self.selected_year < date.today().year:
+            self.selected_year = date.today().year
         self.end_point = user_input.location.end_point
         self.city_id = user_input.location.city_id
         self.area_id = user_input.location.area_id
 
-        self.title = "Müllabfuhr {}".format(str(self.thisYear))
-        self.file_name = "garbageCalendar{}".format(str(self.thisYear))
-        self.address = "{} {}\n{}".format(
-            user_input.street, user_input.house_number, user_input.city
-        )
-        self.num_months = 12
-        self.num_days = 31
+        self._title = f"Müllabfuhr {str(self.selected_year)}"
+        self._file_name = f"garbageCalendar{str(self.selected_year)}"
+        self._address = f"{user_input.street} {user_input.house_number}\n{user_input.city}"
+        self._num_months = 12
+        self._num_days = 31
 
     def create_pdf(self):
         empty_cell_color = "#ffffff"
@@ -66,14 +64,14 @@ class TableCreator(BaseRequests):
             linewidth=1,
             tight_layout={"pad": 1.5},
         )
-        ax = plt.gca()
-        ax.axis("off")
-        plt.box(on=None)  # Add title
-        plt.suptitle(self.title)  # Add footer
+        _ax = plt.gca()
+        _ax.axis("off")
+        plt.box(on=None)  # Add _title
+        plt.suptitle(self._title)  # Add footer
         plt.figtext(
             0.95,
             0.05,
-            self.address,
+            self._address,
             horizontalalignment="right",
             size=6,
             weight="light",
@@ -81,18 +79,19 @@ class TableCreator(BaseRequests):
 
         # Add a table at the bottom of the axes
         calendar_tab = plt.table(
-            cellText=[[""] * (3 * self.num_months)] * self.num_days,
-            rowLabels=range(1, self.num_days + 1),
+            cellText=[[""] * (3 * self._num_months)] * self._num_days,
+            rowLabels=range(1, self._num_days + 1),
             rowLoc="center",
-            colLabels=[""] * (3 * self.num_months),
+            colLabels=[""] * (3 * self._num_months),
             loc="upper center",
-            colWidths=[0.03] * (3 * self.num_months),
+            colWidths=[0.03] * (3 * self._num_months),
         )
         calendar_tab.auto_set_font_size(False)
         calendar_tab.set_fontsize(6)
 
+        # write header
         ypos_header = 0
-        for xpos in range(0, self.num_months):
+        for xpos in range(0, self._num_months):
             month = xpos + 1
             xpos = xpos * 3
             cell = calendar_tab[ypos_header, xpos + 2]
@@ -101,29 +100,29 @@ class TableCreator(BaseRequests):
             cell.visible_edges = "B"
             cell = calendar_tab[ypos_header, xpos + 1]
             cell.visible_edges = "B"
-            if ypos_header == ypos_header:
-                month_name = calendar.month_name[month]
-                calendar_tab[ypos_header, xpos + 2].set_text_props(ha="right")
-                calendar_tab[ypos_header, xpos + 2].get_text().set_text(month_name)
+            month_name = calendar.month_name[month]
+            calendar_tab[ypos_header, xpos + 2].set_text_props(ha="right")
+            calendar_tab[ypos_header, xpos + 2].get_text().set_text(month_name)
 
-        for xpos in range(0, self.num_months):
+        # fill remaining cells:
+        for xpos in range(0, self._num_months):
             month = xpos + 1
             xpos = xpos * 3
 
-            maxDays = monthrange(self.thisYear, month)
+            max_days = monthrange(self.selected_year, month)
             # get calendar data
-            response = requests.get(self.get_url_monthly_dates(self.thisYear, month))
+            response = requests.get(self.get_url_monthly_dates(self.selected_year, month))
             data = response.json()["dates"]
 
-            for day in range(1, self.num_days + 1):
-                if day < maxDays[1] + 1:
-                    runningDate = date(self.thisYear, month, day)
+            for day in range(1, self._num_days + 1):
+                if day < max_days[1] + 1:
+                    running_date = date(self.selected_year, month, day)
                     # write week day:
-                    week_day = self.weekdays[runningDate.weekday()]
+                    week_day = self.weekdays[running_date.weekday()]
                     cell = calendar_tab[day, xpos]
                     cell.get_text().set_text(week_day)
                     cell.set_text_props(ha="left")
-                    if runningDate.weekday() == 5 or runningDate.weekday() == 6:
+                    if running_date.weekday() == 5 or running_date.weekday() == 6:
                         cell.set_text_props(weight="bold")
 
                     if len(data) == 0:
@@ -133,7 +132,7 @@ class TableCreator(BaseRequests):
                     for date_info in data:
                         if (
                             datetime.strptime(date_info["day"], "%Y-%m-%d").date()
-                            == runningDate
+                            == running_date
                         ):
                             garbage_type = date_info["trash_name"]
 
@@ -147,10 +146,10 @@ class TableCreator(BaseRequests):
                             ):
                                 xcounter += 1
                                 cell = calendar_tab[day, xpos + xcounter]
-                            cellInfo = self.type_dict.get(garbage_type)
-                            cell.get_text().set_text(cellInfo.get("cellValue"))
+                            cell_info = self.type_dict.get(garbage_type)
+                            cell.get_text().set_text(cell_info.get("cellValue"))
                             cell.set_text_props(ha="center")
-                            cell.set_facecolor(f'#{cellInfo.get("cellColor")}')
+                            cell.set_facecolor(f'#{cell_info.get("cellColor")}')
                             cell.set_edgecolor("none")
 
                 # format cells
@@ -169,28 +168,28 @@ class TableCreator(BaseRequests):
                 cell = calendar_tab[day, xpos]
                 cell.visible_edges = "LTB"
 
-        with PdfPages(self.file_name + ".pdf") as export_pdf:
+        with PdfPages(self._file_name + ".pdf") as export_pdf:
             plt.draw()
             export_pdf.savefig()
             plt.close()
 
     def create_excel(self):
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "calendar"
+        _wb = openpyxl.Workbook()
+        _ws = _wb.active
+        _ws.title = "calendar"
 
         empty_cell_color = "00000000"
 
-        yOffset = 2
-        xOffset = 1
+        yoffset = 2
+        xoffset = 1
         rowspan = 2
         # write heading:
-        ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=15)
-        cell = ws.cell(row=1, column=1)
-        cell.value = self.title
+        _ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=15)
+        cell = _ws.cell(row=1, column=1)
+        cell.value = self._title
         cell.alignment = Alignment(horizontal="left")
         cell.font = Font(bold=True, size=32)
-        ws.row_dimensions[1].height = 40
+        _ws.row_dimensions[1].height = 40
 
         # border definition:
         border = Side(border_style="hair", color="000000")
@@ -201,13 +200,13 @@ class TableCreator(BaseRequests):
         top_border = Border(top=border)
 
         # write numbers at border:
-        ws.column_dimensions[get_column_letter(xOffset)].width = 4
+        _ws.column_dimensions[get_column_letter(xoffset)].width = 4
         # first empty cell:
-        cell = ws.cell(row=yOffset, column=xOffset)
+        cell = _ws.cell(row=yoffset, column=xoffset)
         cell.border = full_border
         # number cells:
-        for num in range(1, self.num_days + 1):
-            cell = ws.cell(row=num + yOffset, column=xOffset)
+        for num in range(1, self._num_days + 1):
+            cell = _ws.cell(row=num + yoffset, column=xoffset)
             cell.value = num
             cell.alignment = Alignment(horizontal="center")
             cell.font = Font(bold=True)
@@ -215,64 +214,62 @@ class TableCreator(BaseRequests):
 
         # for loop over dict/array
         # write legend:
-        row = 33 + yOffset
-        col = xOffset + 1
+        row = 33 + yoffset
+        col = xoffset + 1
         for garbage_type in self.type_dict:
-            cellInfo = self.type_dict.get(garbage_type)
-            cell = ws.cell(row=row, column=col)
+            cell_info = self.type_dict.get(garbage_type)
+            cell = _ws.cell(row=row, column=col)
             cell.alignment = Alignment(horizontal="center")
-            cell.value = cellInfo.get("cellValue")
-            colorFill = PatternFill(
-                fgColor=cellInfo.get("cellColor"), fill_type="solid"
+            cell.value = cell_info.get("cellValue")
+            color_fill = PatternFill(
+                fgColor=cell_info.get("cellColor"), fill_type="solid"
             )
-            cell.fill = colorFill
-            cell = ws.cell(row=row, column=col + 1)
-            cell.value = ": " + cellInfo.get("description")
+            cell.fill = color_fill
+            cell = _ws.cell(row=row, column=col + 1)
+            cell.value = ": " + cell_info.get("description")
             col = col + rowspan + 1
 
-        counter = 0
-
-        for month in range(1, self.num_months + 1):
+        for month in range(1, self._num_months + 1):
             # write month names on top:
-            xPos = month * rowspan + month - rowspan + xOffset
-            cell = ws.cell(row=yOffset, column=xPos)
+            xpos = month * rowspan + month - rowspan + xoffset
+            cell = _ws.cell(row=yoffset, column=xpos)
             cell.value = calendar.month_name[month]
             cell.alignment = Alignment(horizontal="center")
             cell.font = Font(bold=True)
             cell.border = full_border
-            ws.merge_cells(
-                start_row=yOffset,
-                start_column=xPos,
-                end_row=yOffset,
-                end_column=xPos + rowspan,
+            _ws.merge_cells(
+                start_row=yoffset,
+                start_column=xpos,
+                end_row=yoffset,
+                end_column=xpos + rowspan,
             )
-            maxDays = monthrange(self.thisYear, month)
+            max_days = monthrange(self.selected_year, month)
             # format weekday column:
-            ws.column_dimensions[get_column_letter(xPos)].width = 4
-            for colCounter in range(1, rowspan + 1):
-                ws.column_dimensions[get_column_letter(xPos + colCounter)].width = 6
+            _ws.column_dimensions[get_column_letter(xpos)].width = 4
+            for col_counter in range(1, rowspan + 1):
+                _ws.column_dimensions[get_column_letter(xpos + col_counter)].width = 6
 
             # get calendar data
-            response = requests.get(self.get_url_monthly_dates(self.thisYear, month))
+            response = requests.get(self.get_url_monthly_dates(self.selected_year, month))
             data = response.json()["dates"]
 
             # loop through days of month:
-            for day in range(1, maxDays[1] + 1):
-                runningDate = date(self.thisYear, month, day)
-                yPos = yOffset + day
+            for day in range(1, max_days[1] + 1):
+                running_date = date(self.selected_year, month, day)
+                ypos = yoffset + day
                 # write weekday:
-                cell = ws.cell(row=yPos, column=xPos)
-                cell.value = self.weekdays[runningDate.weekday()]
+                cell = _ws.cell(row=ypos, column=xpos)
+                cell.value = self.weekdays[running_date.weekday()]
                 # print "Sa" and "So" bold:
-                if runningDate.weekday() == 5 or runningDate.weekday() == 6:
+                if running_date.weekday() == 5 or running_date.weekday() == 6:
                     cell.font = Font(bold=True)
                 # put borders
                 cell.border = full_border
-                for colCounter in range(1, rowspan + 1):
-                    cell = ws.cell(row=yPos, column=xPos + colCounter)
-                    if colCounter == 1:
+                for col_counter in range(1, rowspan + 1):
+                    cell = _ws.cell(row=ypos, column=xpos + col_counter)
+                    if col_counter == 1:
                         cell.border = top_bottom_left_border
-                    elif colCounter == rowspan:
+                    elif col_counter == rowspan:
                         cell.border = top_bottom_right_border
                     else:
                         cell.border = top_bottom_border
@@ -284,53 +281,53 @@ class TableCreator(BaseRequests):
                 for date_info in data:
                     if (
                         datetime.strptime(date_info["day"], "%Y-%m-%d").date()
-                        == runningDate
+                        == running_date
                     ):
                         garbage_type = date_info["trash_name"]
 
                         # format cell:
                         xcounter = 1
-                        cell = ws.cell(row=yPos, column=xPos + xcounter)
+                        cell = _ws.cell(row=ypos, column=xpos + xcounter)
                         while (
                             xcounter < rowspan
                             and cell.fill.start_color.index != empty_cell_color
                         ):
                             xcounter += 1
-                            cell = ws.cell(row=yPos, column=xPos + xcounter)
+                            cell = _ws.cell(row=ypos, column=xpos + xcounter)
                         cell.alignment = Alignment(horizontal="center")
-                        cellInfo = self.type_dict.get(garbage_type)
-                        cell.value = cellInfo.get("cellValue")
-                        colorFill = PatternFill(
+                        cell_info = self.type_dict.get(garbage_type)
+                        cell.value = cell_info.get("cellValue")
+                        color_fill = PatternFill(
                             # fgColor=date_info["color"],
-                            fgColor=cellInfo.get("cellColor"),
+                            fgColor=cell_info.get("cellColor"),
                             fill_type="solid",
                         )
-                        cell.fill = colorFill
+                        cell.fill = color_fill
 
                 # merge cells if only one entry:
-                cell = ws.cell(row=yPos, column=xPos + rowspan)
+                cell = _ws.cell(row=ypos, column=xpos + rowspan)
                 if cell.fill.start_color.index == empty_cell_color:
-                    ws.merge_cells(
-                        start_row=yPos,
-                        start_column=xPos + 1,
-                        end_row=yPos,
-                        end_column=xPos + rowspan,
+                    _ws.merge_cells(
+                        start_row=ypos,
+                        start_column=xpos + 1,
+                        end_row=ypos,
+                        end_column=xpos + rowspan,
                     )
 
             # put border in last cell of month:
-            for colCounter in range(0, rowspan + 1):
-                cell = ws.cell(row=yOffset + 32, column=xPos + colCounter)
+            for col_counter in range(0, rowspan + 1):
+                cell = _ws.cell(row=yoffset + 32, column=xpos + col_counter)
                 cell.border = top_border
 
         # define print area
-        ws.print_area = "A1:AK35"
+        _ws.print_area = "A1:AK35"
         # set to page landscape mode
-        ws.set_printer_settings(
+        _ws.set_printer_settings(
             paper_size=openpyxl.worksheet.worksheet.Worksheet.PAPERSIZE_A4,
             orientation=openpyxl.worksheet.worksheet.Worksheet.ORIENTATION_LANDSCAPE,
         )
         # define scaling when printing
-        ws.sheet_properties.pageSetUpPr.fitToPage = True
-        ws.page_setup.fitToHeight = False
+        _ws.sheet_properties.pageSetUpPr.fitToPage = True
+        _ws.page_setup.fitToHeight = False
 
-        wb.save(self.file_name + ".xls")
+        _wb.save(self._file_name + ".xls")

@@ -22,19 +22,16 @@ class BaseRequests:
         self.city_id = data[0]["id"]
 
     def get_url_cities(self):
-        url = self.base_url.format(self.end_point) + "?r=cities"
+        url = f"{self.base_url.format(self.end_point)}?r=cities"
         return url
 
     def get_url_streets(self):
-        url = self.base_url.format(self.end_point) + "?r=streets&city_id={}".format(
-            self.city_id
-        )
+        url = f"{self.base_url.format(self.end_point)}?r=streets&city_id={self.city_id}"
         return url
 
     def get_url_monthly_dates(self, year, month):
-        url = self.base_url.format(
-            self.end_point
-        ) + "?r=calendar/{}-{:02d}&city_id={}&area_id={}".format(
+        url = "{}?r=calendar/{}-{:02d}&city_id={}&area_id={}".format(
+            self.base_url.format(self.end_point),
             year, month, self.city_id, self.area_id
         )
         return url
