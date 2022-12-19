@@ -11,7 +11,7 @@ class Gui:
     street = ""
     house_number = ""
     year = 0
-    location=None
+    location = None
 
     def __init__(self):
         ## open gui (pipe response from api through) and ask for street and housenumber.
@@ -36,7 +36,9 @@ class Gui:
             state="readonly",
         )
         self._year_input.grid(row=0, column=2)
-        self._city_chooser = ttk.Combobox(self._query_window, width=27, state="readonly")
+        self._city_chooser = ttk.Combobox(
+            self._query_window, width=27, state="readonly"
+        )
         self._city_chooser["values"] = tuple(Location.endpoints.keys())
         self._city_chooser.grid(row=1, column=2)
         self._city_chooser.bind("<<ComboboxSelected>>", self.set_city)
@@ -59,7 +61,9 @@ class Gui:
     def set_city(self, _event):
         self.city = self._city_chooser.get()
         self.location = Location(self.city)
-        self._street_chooser["values"] = tuple(self.location.get_street_names_like(None))
+        self._street_chooser["values"] = tuple(
+            self.location.get_street_names_like(None)
+        )
 
     def set_house_numbers(self, _event):
         self.street = self._street_chooser.get()

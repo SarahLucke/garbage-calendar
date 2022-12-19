@@ -29,7 +29,9 @@ class Location(BaseRequests):
                 result.append(street["name"])
         return result
 
-    def get_ref_area(self, selected_street_name: str, selected_house_number: str) -> int:
+    def get_ref_area(
+        self, selected_street_name: str, selected_house_number: str
+    ) -> int:
         for street in self.data:
             if street["name"] == selected_street_name:
                 for number in street["houseNumbers"]:

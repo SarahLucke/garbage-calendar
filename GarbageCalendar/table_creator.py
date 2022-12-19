@@ -7,6 +7,7 @@ from datetime import date
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib import colors
+from matplotlib.patches import Patch
 
 from openpyxl.styles.fills import PatternFill
 import openpyxl
@@ -53,7 +54,9 @@ class TableCreator(BaseRequests):
 
         self._title = f"Müllabfuhr {str(self.selected_year)}"
         self._file_name = f"garbageCalendar{str(self.selected_year)}"
-        self._address = f"{user_input.street} {user_input.house_number}\n{user_input.city}"
+        self._address = (
+            f"{user_input.street} {user_input.house_number}\n{user_input.city}"
+        )
         self._num_months = 12
         self._num_days = 31
 
@@ -66,8 +69,23 @@ class TableCreator(BaseRequests):
         )
         _ax = plt.gca()
         _ax.axis("off")
-        plt.box(on=None)  # Add _title
-        plt.suptitle(self._title)  # Add footer
+
+        legend_elements = []
+        for _, info in self.type_dict.items():
+            legend_elements.append(
+                Patch(facecolor=f"#{info['cellColor']}", label=info["description"])
+            )
+        _ax.legend(
+            handles=legend_elements,
+            loc="lower left",
+            bbox_to_anchor=(-0.1, 1),
+            prop={"size": 5, "weight": "light"},
+        )
+
+        plt.box(on=None)
+        # Add _title
+        plt.suptitle(self._title)
+        # Add footer
         plt.figtext(
             0.95,
             0.05,
@@ -111,7 +129,9 @@ class TableCreator(BaseRequests):
 
             max_days = monthrange(self.selected_year, month)
             # get calendar data
-            response = requests.get(self.get_url_monthly_dates(self.selected_year, month))
+            response = requests.get(
+                self.get_url_monthly_dates(self.selected_year, month)
+            )
             data = response.json()["dates"]
 
             for day in range(1, self._num_days + 1):
@@ -250,7 +270,9 @@ class TableCreator(BaseRequests):
                 _ws.column_dimensions[get_column_letter(xpos + col_counter)].width = 6
 
             # get calendar data
-            response = requests.get(self.get_url_monthly_dates(self.selected_year, month))
+            response = requests.get(
+                self.get_url_monthly_dates(self.selected_year, month)
+            )
             data = response.json()["dates"]
 
             # loop through days of month:

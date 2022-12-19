@@ -32,6 +32,9 @@ class BaseRequests:
     def get_url_monthly_dates(self, year, month):
         url = "{}?r=calendar/{}-{:02d}&city_id={}&area_id={}".format(
             self.base_url.format(self.end_point),
-            year, month, self.city_id, self.area_id
+            year,
+            month,
+            self.city_id,
+            self.area_id,
         )
         return url
