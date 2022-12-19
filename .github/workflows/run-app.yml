@@ -45,5 +45,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: calendar_xml
-        path: garbageCalendar*.xls
+        path: garbageCalendar*.*
         retention-days: 1
