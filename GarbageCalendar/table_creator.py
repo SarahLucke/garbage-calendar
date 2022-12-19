@@ -44,7 +44,9 @@ class TableCreator(BaseRequests):
     }
 
     def __init__(self, user_input):
-        self.thisYear = 2023  # date.today().year
+        self.thisYear = user_input.year
+        if self.thisYear < date.today().year:
+            self.thisYear = date.today().year
         self.end_point = user_input.location.end_point
         self.city_id = user_input.location.city_id
         self.area_id = user_input.location.area_id
@@ -63,7 +65,6 @@ class TableCreator(BaseRequests):
         plt.figure(
             linewidth=1,
             tight_layout={"pad": 1.5},
-            # figsize=(5,3)
         )
         ax = plt.gca()
         ax.axis("off")
@@ -95,21 +96,13 @@ class TableCreator(BaseRequests):
             month = xpos + 1
             xpos = xpos * 3
             cell = calendar_tab[ypos_header, xpos + 2]
-            # cell.auto_set_font_size(False)
             cell.visible_edges = "B"
-            # cell.set_edgecolor('none')
             cell = calendar_tab[ypos_header, xpos]
-            # cell.auto_set_font_size(False)
             cell.visible_edges = "B"
-            # cell.set_edgecolor('none')
             cell = calendar_tab[ypos_header, xpos + 1]
-            # cell.auto_set_font_size(False)
             cell.visible_edges = "B"
-            # cell.set_edgecolor('none')
             if ypos_header == ypos_header:
                 month_name = calendar.month_name[month]
-                #                 calendar_tab[ypos_header, xpos+1].set_text_props(ha="center")
-                #                 calendar_tab[ypos_header, xpos+1].get_text().set_text(month_name)
                 calendar_tab[ypos_header, xpos + 2].set_text_props(ha="right")
                 calendar_tab[ypos_header, xpos + 2].get_text().set_text(month_name)
 
@@ -175,8 +168,6 @@ class TableCreator(BaseRequests):
                         cell.set_text_props(ha="right")
                 cell = calendar_tab[day, xpos]
                 cell.visible_edges = "LTB"
-
-        # plt.show()
 
         with PdfPages(self.file_name + ".pdf") as export_pdf:
             plt.draw()

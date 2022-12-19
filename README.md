@@ -2,7 +2,7 @@
 
 This Python tool requests the future garbage collection schedule from the jumomind webservice. The received data is used to output a garbage collection calendar in excel or pdf that is ready to be printed as seen below.
 
-![screenshot garbage calendar from excel](screenshots/garbage_calendar_xml.png)
+![screenshot garbage calendar from excel](screenshots/garbage_calendar_xls.png)
 ![screenshot garbage calendar from pdf](screenshots/garbage_calendar_pdf.png)
 
 ## Implementation
