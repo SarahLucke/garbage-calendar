@@ -1,12 +1,15 @@
 # Garbage Calendar
 
-This Python tool requests the future garbage collection schedule from the [Ingolstädter Kommunalbetriebe](https://www.in-kb.de/Abfall/Abfallkalender) webservice. The received data is used to output a garbage collection calendar in excel that is ready to be printed as seen below.
+This Python tool requests the future garbage collection schedule from the jumomind webservice. The received data is used to output a garbage collection calendar in excel or pdf that is ready to be printed as seen below.
 
-![screenshot garbage calendar in pdf](screenshots/garbage_calendar.png)
+![screenshot garbage calendar from excel](screenshots/garbage_calendar_xml.png)
+![screenshot garbage calendar from pdf](screenshots/garbage_calendar_pdf.png)
 
 ## Implementation
 
-The project uses the [requests package](https://pypi.org/project/requests/) to read in information from the webservice. For writing the gathered information into the excel file, the [openpyxl package](https://pypi.org/project/openpyxl/) is required.
+The project uses the [requests package](https://pypi.org/project/requests/) to read in information from the webservice.  
+For writing the gathered information into the excel file, the [openpyxl package](https://pypi.org/project/openpyxl/) is required.  
+The same is done with for pdf using [matplotlib](https://pypi.org/project/matplotlib/).  
 
 ## Installing the package
 
