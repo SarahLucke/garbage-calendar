@@ -1,6 +1,7 @@
 # Garbage Calendar
 
-This Python tool requests the future garbage collection schedule from the jumomind webservice. The received data is used to output a garbage collection calendar in excel or pdf that is ready to be printed as seen below.
+This Python tool requests the future garbage collection schedule from the jumomind webservice. The received data is used to output a garbage collection calendar in excel or pdf that is ready to be printed as seen below.  
+Currently. only Ingolstadt is supported.
 
 ![screenshot garbage calendar from excel](screenshots/garbage_calendar_xls.png)
 ![screenshot garbage calendar from pdf](screenshots/garbage_calendar_pdf.png)
@@ -9,7 +10,7 @@ This Python tool requests the future garbage collection schedule from the jumomi
 
 The project uses the [requests package](https://pypi.org/project/requests/) to read in information from the webservice.  
 For writing the gathered information into the excel file, the [openpyxl package](https://pypi.org/project/openpyxl/) is required.  
-The same is done with for pdf using [matplotlib](https://pypi.org/project/matplotlib/).  
+The same is done for pdf using [matplotlib](https://pypi.org/project/matplotlib/).  
 
 ## Installing the package
 
@@ -24,8 +25,8 @@ To install and use the package, use the following commands:
 sudo apt-get install python3-pip
 sudo apt-get install python3-tk
 # to install the package:
-git clone https://github.com/SarahLucke/garbage-calendar-ingolstadt.git
-cd garbage-calendar-ingolstadt/
+git clone https://github.com/SarahLucke/garbage-calendar.git
+cd garbage-calendar/
 python3 -m pip install .
 
 # to run the package and output the calendar into the current directory:
