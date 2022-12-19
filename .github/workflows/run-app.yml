@@ -12,6 +12,9 @@ on:
       house-number:
         description: 'House number you wish to create the calendar for'
         required: true
+      year:
+        description: 'Year you wish to create the calendar for (default: current year)'
+        required: false
 
 permissions:
   contents: read
@@ -36,7 +39,7 @@ jobs:
     - name: run the script
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        python3 -m GarbageCalendar ${{ inputs.city }} ${{ inputs.street }} ${{ inputs.house-number }}
+        python3 -m GarbageCalendar ${{ inputs.city }} ${{ inputs.street }} ${{ inputs.house-number }} ${{ inputs.year }}
         
     - name: archive created file
       uses: actions/upload-artifact@v3
