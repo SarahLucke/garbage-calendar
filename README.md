@@ -25,8 +25,8 @@ To install and use the package, use the following commands:
 sudo apt-get install python3-pip
 sudo apt-get install python3-tk
 # to install the package:
-git clone https://github.com/SarahLucke/garbage-calendar-ingolstadt.git
-cd garbage-calendar-ingolstadt/
+git clone https://github.com/SarahLucke/garbage-calendar.git
+cd garbage-calendar/
 python3 -m pip install .
 
 # to run the package and output the calendar into the current directory:
